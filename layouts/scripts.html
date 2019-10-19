@@ -1,0 +1,22 @@
+<script>
+	function connectionTest(){
+		$.post('/database/connection.php', {},function(data){
+				$("#dbt").html(data);
+		})
+	}
+	function createDatabase(){
+		$.post('/database/create_database.php', {},function(data){
+				$("#dc").html(data);
+		})
+	}
+	function migrate(){
+		$.post('/database/migrate.php', {},function(data){
+				$("#dm").html(data);
+		})
+	}
+	function rollback(){
+		$.post('/database/rollback.php', {},function(data){
+				$("#dr").html(data);
+		})
+	}
+</script>
