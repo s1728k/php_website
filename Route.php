@@ -5,12 +5,15 @@ class Route{
   private static $routes = Array();
   private static $pathNotFound = null;
   private static $methodNotAllowed = null;
+  private static $runMiddleware = null;
 
-  public static function add($expression, $function, $method = 'get'){
+  public static function add($expression, $function, $method = 'get', $auth = 'guest', $role = 'root'){
     array_push(self::$routes,Array(
       'expression' => $expression,
       'function' => $function,
-      'method' => $method
+      'method' => $method,
+      'auth' => $auth,
+      'role' => $role,
     ));
   }
 
@@ -20,6 +23,10 @@ class Route{
 
   public static function methodNotAllowed($function){
     self::$methodNotAllowed = $function;
+  }
+
+  public static function runMiddleware($function){
+    self::$runMiddleware = $function;
   }
 
   public static function run($basepath = '/'){
@@ -40,8 +47,9 @@ class Route{
 
     $route_match_found = false;
 
-    foreach(self::$routes as $route){
+    session_start(); 
 
+    foreach(self::$routes as $route){
       // If the method matches check the path
 
       // Add basepath to matching string
@@ -57,13 +65,17 @@ class Route{
 
       // echo $route['expression'].'<br/>';
 
-      // Check path match	
+      // Check path match 
       if(preg_match('#'.$route['expression'].'#',$path,$matches)){
 
         $path_match_found = true;
 
         // Check method match
         if(strtolower($method) == strtolower($route['method'])){
+
+          if(self::$runMiddleware){
+            call_user_func_array(self::$runMiddleware, Array($route));
+          }
 
           array_shift($matches);// Always remove first element. This contains the whole string
 
@@ -79,6 +91,7 @@ class Route{
           break;
         }
       }
+      
     }
 
     // No matching route was found
@@ -95,7 +108,6 @@ class Route{
         if(self::$pathNotFound){
           call_user_func_array(self::$pathNotFound, Array($path));
         }
-        include('404.php');
       }
 
     }

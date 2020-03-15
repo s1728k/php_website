@@ -9,13 +9,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	    die("Connection failed: " . $conn->connect_error);
 	}
 
-	$drops = ['MyGuests'];
+	$drops = [];
 
 	foreach ($drops as $drop) {
 		if ($conn->query("DROP TABLE $drop") === TRUE) {
-		    echo "Table MyGuests deleted successfully";
+		    echo "Table $drop deleted successfully<br>";
 		} else {
-		    echo "Error deleting table: " . $conn->error;
+		    echo "Error deleting table: " . $conn->error."<br>";
 		}
 	}
 

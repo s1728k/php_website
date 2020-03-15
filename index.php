@@ -1,26 +1,26 @@
 <?php
 
-// Include router class
-include('Route.php');
-// Add base route (startpage)
-Route::add('/kreditbee/',function(){
-    include('home.php');
-});
-// Simple test route that simulates static html file
-Route::add('/kreditbee/test',function(){
-    echo 'Hello from test.html';
-});
-// Post route example
-Route::add('/kreditbee/contact-form',function(){
-    echo '<form method="post"><input type="text" name="test" /><input type="submit" value="send" /></form>';
+include('env.php');
+include('route.php');
+
+Route::add('/',function()use($app_key){
+    include($app_key.'/view/home.php');
+},'get','user');
+Route::add('/login_form',function()use($app_key){
+    include($app_key.'/view/login.php');
 },'get');
-// Post route example
-Route::add('/kreditbee/contact-form',function(){
-    echo 'Hey! The form has been sent:<br/>';
-    print_r($_POST);
-},'post');
-// Accept only numbers as parameter. Other characters will result in a 404 error
-Route::add('/kreditbee/foo/([0-9]*)/bar',function($var1){
-    echo $var1.' is a great number!';
+
+//==============================End OF Routes===================================
+Route::pathNotFound(function($path)use($app_key){
+    include($app_key.'/include/404.php');
 });
+
+Route::methodNotAllowed(function($path, $method)use($app_key){
+    include($app_key.'/include/405.php');
+});
+
+Route::runMiddleware(function($route)use($app_key){
+    include($app_key.'/middleware/middlewares.php');
+});
+
 Route::run('/');
